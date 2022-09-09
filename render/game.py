@@ -181,8 +181,6 @@ trigs = [
     t7, t8, t9, t10, t11, t12
 ]
 
-del_t = 0.005
-
 # PYRAMID
 L = 1
 
@@ -228,6 +226,13 @@ for row in range(len(points_list) - 1):
             points_list[row + 1][col], points_list[row][col + 1], points_list[row + 1][col + 1])
         trigs_list.extend((temp1, temp2))
 
+for col in range(len(points_list[-1]) - 1):
+    temp1 = Triangle(
+        points_list[-1][col], points_list[0][col], points_list[-1][col + 1])
+    temp2 = Triangle(
+        points_list[0][col], points_list[-1][col + 1], points_list[0][col + 1])
+    trigs_list.extend((temp1, temp2))
+
 p_top = Point(R*math.cos(0)*math.sin(0), R *
               math.sin(0)*math.sin(0), R*math.cos(0))
 for row in range(len(points_list) - 1):
@@ -240,8 +245,36 @@ for row in range(len(points_list) - 1):
     trigs_list.append(
         Triangle(points_list[row][-1], p_bottom, points_list[row+1][-1]))
 
-trigs = trigs_list.copy()
 
+# SOIL
+
+L = 3.
+N = 20
+x_list = np.linspace(0, L, N)
+z_list = np.linspace(0, L, N)
+points_list = [[0]*N for i in range(N)]
+
+phase_x = np.random.random()*2*np.pi
+phase_z = np.random.random()*2*np.pi
+
+
+for i in range(len(points_list)):
+    for j in range(len(points_list[0])):
+        points_list[i][j] = Point(x_list[i], math.sin(x_list[i]*2*np.pi/L + phase_x)*math.cos(
+            z_list[j]*2*np.pi/L+phase_z)*0.3 + np.random.random()*0.1, z_list[j])
+
+trigs_list = []
+for i in range(len(points_list) - 1):
+    for j in range(len(points_list[0]) - 1):
+        temp1 = Triangle(
+            points_list[i][j], points_list[i + 1][j], points_list[i][j + 1])
+        temp2 = Triangle(
+            points_list[i + 1][j], points_list[i][j + 1], points_list[i + 1][j + 1])
+        trigs_list.extend((temp1, temp2))
+
+
+trigs = trigs_list.copy()
+del_t = 0.001
 while True:
     theta_x += del_t*omega_x
     theta_z += del_t*omega_z
@@ -260,7 +293,7 @@ while True:
 
     mesh = Mesh(trigs)
     rotated_mesh = rotate_mesh(mesh)
-    translated_mesh = translate(rotated_mesh, [.0, .0, 2.])
+    translated_mesh = translate(rotated_mesh, [-1.1, +1, 1.5])
     trigs_to_scale = get_trigs_to_render(translated_mesh.trigs)
     trigs_to_render = rescale_projection_to_screen(trigs_to_scale)
     time.sleep(0.01)
@@ -270,4 +303,3 @@ while True:
     root.update()
 
 root.mainloop()
-
