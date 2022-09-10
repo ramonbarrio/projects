@@ -8,9 +8,10 @@ import cubemesh
 import spheremesh
 import soilmesh
 
-CAMERA = [0, 0, 0]
-FIELD_OF_VIEW = 90*math.pi/180
-ZFAR = 1000
+CAMERA = [0., 0., 0.]
+LIGHT_DIR = [0., 0., -1.]
+FIELD_OF_VIEW = 90.*math.pi/180
+ZFAR = 1000.
 ZNEAR = 0.5
 
 HEIGHT = 700
@@ -21,13 +22,13 @@ F = 1/math.tan(FIELD_OF_VIEW/2)
 Q = ZFAR/(ZFAR-ZNEAR)
 
 
-theta_x = 0
-theta_y = 0
-theta_z = 0
+theta_x = 0.
+theta_y = 0.
+theta_z = 0.
 
-omega_x = 30
-omega_y = 7
-omega_z = 8
+omega_x = 30.
+omega_y = 7.
+omega_z = 8.
 
 projection_matrix = np.array([
     [RATIO*F, 0, 0, 0],
@@ -69,7 +70,7 @@ def norm(v):
     return pow(pow(v[0], 2)+pow(v[1], 2)+pow(v[2], 2), 0.5)
 
 
-def dir(v):
+def direction(v):
     # vector_director
     return np.array(v)/norm(v)
 
@@ -77,23 +78,32 @@ def dir(v):
 def norm_cross(v1, v2):
     # cross_product normalized
     temp = cross(v1, v2)
-    return np.array(dir(temp))
+    return np.array(direction(temp))
+
+
+def find_color(trig):
+    global LIGHT_DIR
+    print(np.dot(trig.normal(), direction(LIGHT_DIR)))
+    luminosity = hex(int(255*np.dot(trig.normal(), direction(LIGHT_DIR))))[2:]
+    return '#' + '00' + luminosity + '00'
 
 
 def get_trigs_to_render(trigs_list):
     trigs_to_render = [0]*len(trigs_list)
-
+    trigs_to_render = {}
+    if len(trigs_list) < 1:
+        raise Exception("get_trigs_to_render > No trigs in trigs list")
     for id, trig in enumerate(trigs_list):
-        trigs_to_render[id] = project_trig(trig)
+        trigs_to_render[id] = [project_trig(trig), find_color(trig)]
 
-    return trigs_to_render[:id+1]
+    return trigs_to_render
 
 
 def rescale_projection_to_screen(trigs_to_scale):
-    trigs_res = [0]*len(trigs_to_scale)
-    for id, trig in enumerate(trigs_to_scale):
-        trigs_res[id] = (np.array(trig)+1)*np.array([WIDTH,
-                                                     HEIGHT, WIDTH, HEIGHT, WIDTH, HEIGHT])/2
+    trigs_res = {}
+    for key in trigs_to_scale:
+        trigs_res[key] = [(np.array(trigs_to_scale[key][0])+1)*np.array([WIDTH,
+                                                                         HEIGHT, WIDTH, HEIGHT, WIDTH, HEIGHT])/2, trigs_to_scale[key][1]]
     return trigs_res
 
 
@@ -121,14 +131,14 @@ def translate_mesh(mesh, dir):
 
 
 def get_view_dir(trig, camera):
-    return dir(camera - trig.center())
+    return direction(camera - trig.center())
 
 
 def find_visible_trigs(mesh):
     visible_trigs = []
     for trig in mesh.trigs:
         similarity = np.dot(trig.normal(), get_view_dir(trig, CAMERA))
-        if similarity > 0:
+        if similarity < 0:
             visible_trigs.append(trig)
     mesh = Mesh(visible_trigs)
     return mesh
@@ -138,18 +148,23 @@ root = Tk()
 root.title('MyRenderer')
 root.geometry(str(WIDTH + 40) + 'x' + str(HEIGHT + 40))
 root.config(bg='#345')
+root.eval('tk::PlaceWindow . center')
+
 
 c = Canvas(
     root,
     height=HEIGHT,
     width=WIDTH,
     bg="black"
+
+
 )
 
 c.place(relx=0.5, rely=0.5, anchor=CENTER)
 
-trigs = spheremesh.generate().copy()
-del_t = 0.0001
+trigs = soilmesh.generate().copy()
+del_t = 0.001
+
 while True:
     theta_x += del_t*omega_x
     theta_z += del_t*omega_z
@@ -182,10 +197,11 @@ while True:
     visible_mesh = find_visible_trigs(translated_mesh)
     trigs_to_scale = get_trigs_to_render(visible_mesh.trigs)
     trigs_to_render = rescale_projection_to_screen(trigs_to_scale)
-    time.sleep(0.001)
+    time.sleep(0.0)
     c.delete('all')
-    for trig in trigs_to_render:
-        c.create_polygon(list(trig), fill='', outline='white')
+    for key in trigs_to_render:
+        c.create_polygon(
+            list(trigs_to_render[key][0]), fill=trigs_to_render[key][1], outline='')
     root.update()
 
 root.mainloop()

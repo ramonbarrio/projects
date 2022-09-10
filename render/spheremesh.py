@@ -12,7 +12,7 @@ def generate():
     phi_min = 0.1
     phi_max = math.pi - 0.1
 
-    N = 10
+    N = 20
     theta_list = np.linspace(theta_min, theta_max, 2*N, endpoint=False)
     phi_list = np.linspace(phi_min, phi_max, N, endpoint=True)
 
@@ -44,10 +44,13 @@ def generate():
     for row in range(len(points_list) - 1):
         trigs_list.append(
             Triangle(p_top, points_list[row][0], points_list[row + 1][0]))
+    trigs_list.append(Triangle(p_top, points_list[-1][0], points_list[0][0]))
 
     p_bottom = Point(R*math.cos(0)*math.sin(math.pi), R *
                      math.sin(0)*math.sin(math.pi), R*math.cos(math.pi))
     for row in range(len(points_list) - 1):
         trigs_list.append(
             Triangle(points_list[row][-1], p_bottom, points_list[row+1][-1]))
+    trigs_list.append(
+        Triangle(points_list[-1][-1], p_bottom, points_list[0][-1]))
     return trigs_list
