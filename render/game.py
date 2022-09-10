@@ -185,7 +185,7 @@ while True:
     time.sleep(0.001)
     c.delete('all')
     for trig in trigs_to_render:
-        c.create_polygon(list(trig), fill='', outline='white')
+        c.create_polygon(list(trig), fill='red', outline='white')
     root.update()
 
 root.mainloop()
