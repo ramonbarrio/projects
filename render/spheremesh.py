@@ -27,14 +27,14 @@ def generate():
     for row in range(len(points_list) - 1):
         for col in range(len(points_list[0]) - 1):
             temp1 = Triangle(
-                points_list[row][col], points_list[row + 1][col], points_list[row][col + 1])
+                points_list[row][col], points_list[row][col+1], points_list[row+1][col])
             temp2 = Triangle(
                 points_list[row + 1][col], points_list[row][col + 1], points_list[row + 1][col + 1])
             trigs_list.extend((temp1, temp2))
 
     for col in range(len(points_list[-1]) - 1):
         temp1 = Triangle(
-            points_list[-1][col], points_list[0][col], points_list[-1][col + 1])
+            points_list[-1][col], points_list[-1][col + 1], points_list[0][col])
         temp2 = Triangle(
             points_list[0][col], points_list[-1][col + 1], points_list[0][col + 1])
         trigs_list.extend((temp1, temp2))

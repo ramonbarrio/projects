@@ -11,14 +11,14 @@ def generate():
     p7 = Point(1.0, 1.0, 1.0)
     p8 = Point(0.0, 1.0, 1.0)
 
-    p1 = Point(-.5, -.5, -.5)
+    """ p1 = Point(-.5, -.5, -.5)
     p2 = Point(.5, -.5, -.5)
     p3 = Point(.5, -.5, .5)
     p4 = Point(-.5, -.5, .5)
     p5 = Point(-.5, .5, -.5)
     p6 = Point(.5, .5, -.5)
     p7 = Point(.5, .5, .5)
-    p8 = Point(-.5, .5, .5)
+    p8 = Point(-.5, .5, .5) """
 
     t1 = Triangle(p1.copy(), p2.copy(), p3.copy())
     t2 = Triangle(p1.copy(), p3.copy(), p4.copy())

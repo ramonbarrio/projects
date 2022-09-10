@@ -2,6 +2,8 @@ from entities import Point, Triangle
 import numpy as np
 import math
 
+# add that nice noise option
+
 
 def generate():
     L = 3.
