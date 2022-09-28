@@ -22,13 +22,13 @@ F = 1/math.tan(FIELD_OF_VIEW/2)
 Q = ZFAR/(ZFAR-ZNEAR)
 
 
-theta_x = 0.
+theta_x = 0
 theta_y = 0.
 theta_z = 0.
 
-omega_x = 30.
+omega_x = 0.
 omega_y = 7.
-omega_z = 8.
+omega_z = 0.
 
 projection_matrix = np.array([
     [RATIO*F, 0, 0, 0],
@@ -83,8 +83,10 @@ def norm_cross(v1, v2):
 
 def find_color(trig):
     global LIGHT_DIR
-    print(np.dot(trig.normal(), direction(LIGHT_DIR)))
-    luminosity = hex(int(255*np.dot(trig.normal(), direction(LIGHT_DIR))))[2:]
+    if np.dot(trig.normal(), direction(LIGHT_DIR)) < 0:
+        return '#000000'
+    luminosity = format(
+        int(255*np.dot(trig.normal(), direction(LIGHT_DIR))), '02x')
     return '#' + '00' + luminosity + '00'
 
 
@@ -138,7 +140,7 @@ def find_visible_trigs(mesh):
     visible_trigs = []
     for trig in mesh.trigs:
         similarity = np.dot(trig.normal(), get_view_dir(trig, CAMERA))
-        if similarity < 0:
+        if similarity > 0:
             visible_trigs.append(trig)
     mesh = Mesh(visible_trigs)
     return mesh
@@ -193,7 +195,7 @@ while True:
 
     mesh = Mesh(trigs)
     rotated_mesh = rotate_mesh(mesh)
-    translated_mesh = translate_mesh(rotated_mesh, [0, 0, 2])
+    translated_mesh = translate_mesh(rotated_mesh, [-2, 2, 5])
     visible_mesh = find_visible_trigs(translated_mesh)
     trigs_to_scale = get_trigs_to_render(visible_mesh.trigs)
     trigs_to_render = rescale_projection_to_screen(trigs_to_scale)

@@ -4,11 +4,11 @@ from tkinter import *
 import time
 from entites import Bridge, Cloth, Knot
 
-HEIGHT = 700
+HEIGHT = 500
 WIDTH = 500
-FRACTION = 0.8
+FRACTION = 0.5
 RATIO = WIDTH/HEIGHT
-OFFSET = (HEIGHT*1-FRACTION)/2
+#OFFSET = (HEIGHT*1-FRACTION)/2
 
 root = Tk()
 root.title('2D Cloth Simulator')
@@ -26,7 +26,7 @@ c = Canvas(
 c.place(relx=0.5, rely=0.5, anchor=CENTER)
 
 
-def build_cloth(width=2, height=1, mass=1, elasticity=1, del_l=0.1):
+def build_cloth(width=1, height=0.4, mass=1, elasticity=1, del_l=0.1):
     nx = int(width/del_l) + 1
     ny = int(height/del_l) + 1
     knot_mass = mass/nx*ny
@@ -41,11 +41,9 @@ def build_cloth(width=2, height=1, mass=1, elasticity=1, del_l=0.1):
                 is_fixed = True
             temp_knot = Knot(knot_id, knot_mass, [i, j], [
                              i*del_l, j*del_l], fixed=is_fixed)
-            print(temp_knot)
             knots_matrix[i][j] = temp_knot
             knots_list[knot_id] = temp_knot
             knot_id += 1
-    print('finished building knots list')
 
     bridges_list = [0]*(2*nx*ny - nx - ny)
     bridge_elasticity = elasticity/del_l
@@ -60,14 +58,12 @@ def build_cloth(width=2, height=1, mass=1, elasticity=1, del_l=0.1):
             if connect_down:
                 temp_bridge = Bridge(
                     bridge_id, bridge_elasticity, del_l, knot_id, knot_id + 1)
-                print(temp_bridge)
                 bridges_list[bridge_id] = temp_bridge
                 bridge_id += 1
 
             if connect_right:
                 temp_bridge = Bridge(
                     bridge_id, bridge_elasticity, del_l, knot_id, knot_id + ny)
-                print(temp_bridge)
                 bridges_list[bridge_id] = temp_bridge
                 bridge_id += 1
 
@@ -90,7 +86,7 @@ while True:
     time.sleep(0.0)
     c.delete('all')
     for line in lines_to_render:
-        c.create_polygon(line, fill='', outline='white')
+        c.create_polygon(line, outline='white')
     root.update()
 
 root.mainloop()
