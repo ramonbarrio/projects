@@ -1,4 +1,4 @@
-import { View, StyleSheet, Text, FlatList } from 'react-native'
+import { View, StyleSheet, Text, FlatList, useWindowDimensions } from 'react-native'
 import Title from '../components/ui/Title'
 import { useState, useEffect } from 'react'
 import NumberContainer from '../components/game/NumberContainer'
@@ -86,6 +86,7 @@ export default GameScreen
 
 const styles = StyleSheet.create({
   gameContainer: {
+    alignItems: 'center',
     flex: 1,
     padding: 24,
   },
